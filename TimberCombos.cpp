@@ -12,6 +12,7 @@ using namespace sf;
 // This is where our game starts from
 int main()
 {
+    //Test VS git
     // Create a video mode object
     VideoMode vm(1920, 1080);
     // Create and open a window for the game
