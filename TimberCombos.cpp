@@ -329,9 +329,8 @@ int main()
                 }
 
             }
-
               
-            // Bee and Bee1 score
+            // Bee scoreboard
             std::stringstream ss[5];
             for (int i = 0; i < 5; i++)
             {
@@ -369,10 +368,7 @@ int main()
                     arrayOrderdBeeNumber[i_OrGr] = i_max + 1;                    
                     i_OrGr++;
                 }
-
-                // Overwirite beeNumber
-                // Kopy elements to new array for print
-                
+                            
                 for (int i = 0; i < 5; i++)
                 {
                     switch (i)
@@ -449,52 +445,7 @@ int main()
         window.display();
 
     }
-
-    // Test: Call 2 succecive time funcions
-    //int varTime0 = (int)time(0);
-    //int varTime1 = (int)time(0);
-    //std::cout << varTime0 << " : " << varTime1 << std::endl;
-
-    // Random number calculation test for two different seeds
-    //srand((int)time(0));
-    //int randNum = rand();
-    //srand((int)time(0)*10);
-    //int randNum1 = rand();
-    //std::cout << randNum << " : " << randNum1 << std::endl; // OK: we get two different numbers
-
-    // Random number calculation
-    //srand((int)time(0)); // seed for the random number generator - rand()
-    //int randNum = rand();
-    //int remNum = (randNum % 100);
-    //std::cout << randNum << '\n';
-    //std::cout << remNum << '\n';
-
-    // Logical expressions
-    //bool a = true;
-    //bool b = true;
-    //bool c = true;
-    //bool expression = ( a && b && c );
-    //std::cout << "( a && b && c ) == " << expression << std::endl;
-
-    // Get current position of bee
-    float currentPosition = spriteBeez[0].getPosition().x;
-    std::cout << "current bee x komponent == " << currentPosition << std::endl;
-    // what is the frame rate for this laptop? - how many frames in a second
-    std::cout << "time in ms per frame = " << timePerFrame.asMilliseconds() << std::endl;
-    std::cout << "time in seconds per frame = " << timePerFrame.asSeconds() << std::endl;
-
-    // Declare, initialize and display a String
-    std::string str0 = "alphanumeric";    
-    std::cout << str0 << std::endl;
-
-    for (int i = 0; i < 5; i++)
-    {        
-        //std::cout << "Bee number " << arrayOrderdBeeNumber[i] << " is on position" << arrayOrderedGroups[i] << std::endl;
-        std::cout << "Bee number " << arrayOrderdBeeNumber[i] << " is on position" << i + 1 << std::endl;
-    }
-        
-
-
+    
     return 0;
 }
 
