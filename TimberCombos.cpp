@@ -42,6 +42,10 @@ int main()
     // Is the bee currently moving?
     bool beezActive[5];
     float beezSpeed[5];
+    int rankedSequence[5]{0, 0, 0, 0, 0}; 
+    int arrayOrderedGroups[5]{};
+    int arrayOrderdBeeNumber[5]{};
+    int beeNumber[5]{ 0, 0, 0, 0, 0 };
     float spriteComponentY = 500.0f;   
 
     for (int i = 0; i < 5; i++)
@@ -126,7 +130,7 @@ int main()
     Text textMessage;
     // Assign the actual message    
     textMessage.setString( "Press Enter to start the Race!" );    
-    textMessage.setCharacterSize(100);    
+    textMessage.setCharacterSize(50);    
     textMessage.setFillColor(Color::Green);        
     textMessage.setFont(font);    
     FloatRect textRect = textMessage.getLocalBounds();
@@ -148,6 +152,16 @@ int main()
     randomRect.setFillColor(Color::Blue);
     srand((int)time(0) * 35);
     randomRect.setPosition(rand() % 1895, rand() % 1055);
+    /*RectangleShape movableRect; // idea for movable rect
+    float width = 30;
+    float height = width;
+    movableRect.setSize(Vector2f(width, height));
+    movableRect.setFillColor(Color::Magenta);
+    float move_y = rand() % 1890;
+    float move_x = rand() % 1050;    
+    float moveRangePx = 30.0f;*/    
+
+
     float timeRemaining = 10.0f; // time is arbitrary number
     float widthPerSecondFrame = timeBarWidth / timeRemaining;
     Text textCheerBee;
@@ -187,7 +201,8 @@ int main()
             positionCheerX = rand() % (1980 - 120); // make text cheer visible
             positionCheerY = rand() % (1080 - 60);
             textCheerBee.setPosition(positionCheerX, positionCheerY);
-        }
+        }        
+
         /* ****************************************
         Update the scene
         **************************************** */
@@ -278,11 +293,8 @@ int main()
                 }
                 
             }
-
-        
-
-
-            //(beeSpeed * dt.asSeconds())
+                        
+            
 
             // Manage the clouds
             // Set up cluds
@@ -318,47 +330,74 @@ int main()
 
             }
 
-  
-
+              
             // Bee and Bee1 score
             std::stringstream ss[5];
             for (int i = 0; i < 5; i++)
             {
-                ss[i] << "score bee "<< (i + 1) << ": " << scoreBeez[i];
+                ss[i] << "score bee "<< (i + 1) << ": " << scoreBeez[i];              
                 textScoreBeez[i].setString(ss[i].str());
             }       
             
             if (timeRemaining <= 0.0f)
             {
                 pause = true;                
-                std::stringstream ss_beeName;
-                int maxScore = scoreBeez[0];
-                int first = 1;
-                
+                std::stringstream ss_beeName;                
+                int first = 1;            
+                int i_OrGr = 0;
+                int maxScore = 0;
+                int i_max = 0;
                 for (int i = 0; i < 5; i++)
-                // look at scores and find max score
                 {
-                    if (scoreBeez[i] > maxScore )
+                    maxScore = scoreBeez[i];
+                    i_max = i;
+                    for (int j = 0; j < 5; j++)
                     {
-                        maxScore = scoreBeez[i];
-                        first = i + 1;
-                    }
-                }
-                
-                for (int i = 0; i < 5; i++)
-                // find the bee with max result and compare position to get the first bee
-                {
-                    if ( i != first && (scoreBeez[i] == maxScore) )
-                    // We have two or more beez with same score, so we compare x component of beez
-                    {
-                        if ( spriteBeez[first].getPosition().x > spriteBeez[i].getPosition().x  )
+                        if ((scoreBeez[j] == maxScore) && (spriteBeez[j].getPosition().x < spriteBeez[i_max].getPosition().x))
                         {
-                            first = i + 1;                            
-                        }             
+                            maxScore = scoreBeez[j];
+                            i_max = j;
+                        } 
+                        else if((scoreBeez[j] > maxScore))
+                        {
+                            maxScore = scoreBeez[j];
+                            i_max = j;
+                        }
                     }
-                    
+                    scoreBeez[i_max] = -1;
+                    arrayOrderedGroups[i_OrGr] = maxScore;
+                    arrayOrderdBeeNumber[i_OrGr] = i_max + 1;                    
+                    i_OrGr++;
                 }
-                ss_beeName << "Bee " << first << " wins!!!";                
+
+                // Overwirite beeNumber
+                // Kopy elements to new array for print
+                
+                for (int i = 0; i < 5; i++)
+                {
+                    switch (i)
+                    {
+                    case 0:
+                        ss_beeName << (0 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[0] << " wins gold!!!\n";
+                        break;
+                    case 1:
+                        ss_beeName << (1 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[1] << " wins silver!!!\n";
+                        break;  
+                    case 2:
+                        ss_beeName << (2 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[2] << " wins bronze!!!\n";
+                        break;        
+                    case 3:
+                        ss_beeName << (3 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[3] << "\n";
+                        break;    
+                    case 4:
+                        ss_beeName << (4 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[4];
+                        break;                        
+                    default:
+                        break;
+                    }
+
+                }
+             
                 textMessage.setString(ss_beeName.str());
                 // Text message has changed so we need new bounds of text m. to reposition the origin of text m.
                 //  to be positioned at the middle of text m.                
@@ -447,6 +486,13 @@ int main()
     // Declare, initialize and display a String
     std::string str0 = "alphanumeric";    
     std::cout << str0 << std::endl;
+
+    for (int i = 0; i < 5; i++)
+    {        
+        //std::cout << "Bee number " << arrayOrderdBeeNumber[i] << " is on position" << arrayOrderedGroups[i] << std::endl;
+        std::cout << "Bee number " << arrayOrderdBeeNumber[i] << " is on position" << i + 1 << std::endl;
+    }
+        
 
 
     return 0;
