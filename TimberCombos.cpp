@@ -9,6 +9,16 @@
 // Make code easier to type with “using namespace”
 using namespace sf;
 
+enum class Position
+{
+    FIRST,
+    SECOND,
+    THIRD,
+    FOURTH,
+    FIFTH
+};
+
+
 // This is where our game starts from
 int main()
 {
@@ -36,9 +46,16 @@ int main()
     spriteTree.setPosition(820, 0);
 
     // Prepare the beez
-    Texture textureBee;
-    textureBee.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/bee.png");
+    Texture textureBee[5];
+    std::stringstream ssBeeFile[5];
+    for (int i = 0; i < 5; i++)
+    {
+        ssBeeFile[i] << "D:/GameProgramming/VS Projects/TimberCombos/graphics/bee" << (i+1) << ".png";
+        textureBee[i].loadFromFile(ssBeeFile[i].str());
+    }
+    
     Sprite spriteBeez[5];
+    Sprite spriteRankedBeez[5];
     // Is the bee currently moving?
     bool beezActive[5];
     float beezSpeed[5];
@@ -46,12 +63,13 @@ int main()
     int arrayOrderedGroups[5]{};
     int arrayOrderdBeeNumber[5]{};
     int beeNumber[5]{ 0, 0, 0, 0, 0 };
+    Position arrFinalPositions[5]{};
     float spriteComponentY = 500.0f;   
 
     for (int i = 0; i < 5; i++)
     {
         // Make 5 beez
-        spriteBeez[i].setTexture(textureBee);
+        spriteBeez[i].setTexture(textureBee[i]);
         spriteBeez[i].setPosition( 0 , spriteComponentY + (i * 1) * 100);
         spriteComponentY += 100.0f;
         beezActive[i] = false;
@@ -164,13 +182,15 @@ int main()
 
     float timeRemaining = 10.0f; // time is arbitrary number
     float widthPerSecondFrame = timeBarWidth / timeRemaining;
-    Text textCheerBee;
+    Text textCheerBee;        
     textCheerBee.setFont(font);
-    textCheerBee.setString("Goo bees!");
+    textCheerBee.setString("Goo beez!");
     textCheerBee.setFillColor(Color::Cyan);
     float positionCheerX = 1000;
     float positionCheerY = 50;
     textCheerBee.setPosition(positionCheerX, positionCheerY);
+    
+  
     int counterCheerBees = 0;
 
     while (window.isOpen()) {
@@ -338,6 +358,8 @@ int main()
                 textScoreBeez[i].setString(ss[i].str());
             }       
             
+            // 
+
             if (timeRemaining <= 0.0f)
             {
                 pause = true;                
@@ -365,7 +387,8 @@ int main()
                     }
                     scoreBeez[i_max] = -1;
                     arrayOrderedGroups[i_OrGr] = maxScore;
-                    arrayOrderdBeeNumber[i_OrGr] = i_max + 1;                    
+                    arrayOrderdBeeNumber[i_OrGr] = i_max + 1;
+                    spriteRankedBeez[i_OrGr] = spriteBeez[i_max]; // Order beez graphicaly
                     i_OrGr++;
                 }
                             
@@ -375,23 +398,53 @@ int main()
                     {
                     case 0:
                         ss_beeName << (0 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[0] << " wins gold!!!\n";
+                        arrFinalPositions[i] = Position::FIRST;
                         break;
                     case 1:
                         ss_beeName << (1 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[1] << " wins silver!!!\n";
+                        arrFinalPositions[i] = Position::SECOND;
                         break;  
                     case 2:
                         ss_beeName << (2 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[2] << " wins bronze!!!\n";
+                        arrFinalPositions[i] = Position::THIRD;
                         break;        
                     case 3:
                         ss_beeName << (3 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[3] << "\n";
+                        arrFinalPositions[i] = Position::FOURTH;
                         break;    
                     case 4:
                         ss_beeName << (4 + 1) << ".position:  Bee " << arrayOrderdBeeNumber[4];
+                        arrFinalPositions[i] = Position::FIFTH;
                         break;                        
                     default:
                         break;
                     }
 
+                }
+
+                // Graphically display 1, 2, 3 bee on top
+                FloatRect rectSpriteBee = spriteRankedBeez[0].getLocalBounds();
+
+                for (int i = 0; i < 3; i++)
+                {
+                    switch (arrFinalPositions[i])
+                    {
+                    case Position::FIRST:
+                        // nastavi sprite bee na prvem mestu novo pozicijo
+                        spriteRankedBeez[i].setOrigin( rectSpriteBee.left + rectSpriteBee.width / 2.0f , rectSpriteBee.top + rectSpriteBee.height / 2.0f );
+                        spriteRankedBeez[i].setPosition(Vector2f(1920 / 2.0f , 1080 / 15));
+                        break;
+                    case Position::SECOND:
+                        spriteRankedBeez[i].setOrigin(rectSpriteBee.left + rectSpriteBee.width / 2.0f, rectSpriteBee.top + rectSpriteBee.height / 2.0f);
+                        spriteRankedBeez[i].setPosition(Vector2f(1920 / 2.0f - rectSpriteBee.width , 1080 / 12));
+                        break;
+                    case Position::THIRD:
+                        spriteRankedBeez[i].setOrigin(rectSpriteBee.left + rectSpriteBee.width / 2.0f, rectSpriteBee.top + rectSpriteBee.height / 2.0f);
+                        spriteRankedBeez[i].setPosition(Vector2f(1920 / 2.0f + rectSpriteBee.width , 1080 / 10));
+                        break;
+                    default:
+                        break;
+                    }
                 }
              
                 textMessage.setString(ss_beeName.str());
@@ -425,18 +478,25 @@ int main()
         // Draw the tree
         window.draw(spriteTree);
         // Draw the insects and score
-        for (int i = 0; i < 5; i++)
-        {
-            window.draw(spriteBeez[i]);
-            window.draw(textScoreBeez[i]);
-        }                        
+   
+  
+        
         // Draw text message
         if (pause)
         {
+            for (int i = 0; i < 3; i++)
+            {
+                window.draw(spriteRankedBeez[i]);
+            }
             window.draw(textMessage);
         }
         if (!pause)
         {
+            for (int i = 0; i < 5; i++)
+            {
+                window.draw(spriteBeez[i]);
+                window.draw(textScoreBeez[i]);
+            }
             window.draw(textCheerBee);
             window.draw(randomRect);
         }
