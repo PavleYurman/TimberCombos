@@ -9,6 +9,10 @@
 // Make code easier to type with “using namespace”
 using namespace sf;
 
+// Function prototypes
+static void setSpriteGraphic(Sprite& spriteGraphic, Texture& textureGraphic, String filePathToGraphic, float x, float y);
+
+
 enum class Position
 {
     FIRST,
@@ -30,28 +34,23 @@ int main()
     // Create a texture to hold a graphic on the GPU
     Texture textureBackground;
     // Load a graphic into the texture
-    textureBackground.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/background.png");
+    String filePathToBackground("D:/GameProgramming/VS Projects/Timber/graphics/background.png");    
     // Create a sprite
     Sprite spriteBackground;
-    // Attach the texture to the sprite
-    spriteBackground.setTexture(textureBackground);
-    // Set the spriteBackground to cover the screen
-    spriteBackground.setPosition(0, 0);
+    setSpriteGraphic(spriteBackground, textureBackground, filePathToBackground, 0, 0);
 
     // Make a tree sprite
     Texture textureTree;
-    textureTree.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/tree.png");
+    String filePathTree("D:/GameProgramming/VS Projects/Timber/graphics/tree.png");
     Sprite spriteTree;
-    spriteTree.setTexture(textureTree);
-    spriteTree.setPosition(820, 0);
+    setSpriteGraphic(spriteTree, textureTree, filePathTree, 820, 0);    
 
     // Prepare the beez
     Texture textureBee[5];
     std::stringstream ssBeeFile[5];
     for (int i = 0; i < 5; i++)
     {
-        ssBeeFile[i] << "D:/GameProgramming/VS Projects/TimberCombos/graphics/bee" << (i+1) << ".png";
-        textureBee[i].loadFromFile(ssBeeFile[i].str());
+        ssBeeFile[i] << "D:/GameProgramming/VS Projects/TimberCombos/graphics/bee" << (i+1) << ".png";        
     }
     
     Sprite spriteBeez[5];
@@ -69,33 +68,28 @@ int main()
     for (int i = 0; i < 5; i++)
     {
         // Make 5 beez
-        spriteBeez[i].setTexture(textureBee[i]);
-        spriteBeez[i].setPosition( 0 , spriteComponentY + (i * 1) * 100);
+        setSpriteGraphic(spriteBeez[i], textureBee[i], ssBeeFile[i].str(), 0, spriteComponentY + (i * 100));        
         spriteComponentY += 100.0f;
         beezActive[i] = false;
         // How fast is the bee moving?
         beezSpeed[i] = 0.0f;
         // Make 5 clouds
     }    
-
-/*    float beeVelocityY = 0.0f;   
-    float beeVelocityX = 0.0f; */  
-
+    
     // Prepare the clouds
     // make 5 cloud sprites from 1 texture
     Texture textureCloud;
-    textureCloud.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/cloud.png");
+    String fileToCloud("D:/GameProgramming/VS Projects/Timber/graphics/cloud.png");
     Sprite spriteClouds[5];
     bool cloudsActive[5];
     float cloudsSpeed[5];
     float cloudPositionY = -40;
     for (size_t i = 0; i < 5; i++)
     {
-        // 5 New sprites with the same texture
-        spriteClouds[i].setTexture(textureCloud);
+        // 5 New sprites with the same texture        
         // Position the clouds on the left of the screen
-        // at different heights
-        spriteClouds[i].setPosition(0, cloudPositionY);
+        // at different heights        
+        setSpriteGraphic(spriteClouds[i], textureCloud, fileToCloud, 0, cloudPositionY);
         cloudPositionY += 40;
         // Are clouds active?
         cloudsActive[i] = false;
@@ -427,7 +421,7 @@ int main()
 
                 for (int i = 0; i < 3; i++)
                 {
-                    switch (arrFinalPositions[i])
+                    switch (arrFinalPositions[i]) // Not necessary beacause the sprite Beez are already ordered from 0 to 4th index(1-5th.position)
                     {
                     case Position::FIRST:
                         // nastavi sprite bee na prvem mestu novo pozicijo
@@ -509,13 +503,14 @@ int main()
     return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+// Definitions of functions
+// Set texture and position to sprite bacground
+static void setSpriteGraphic(Sprite& spriteBackground, Texture& textureBackground, String filePathToBackground, float x, float y)
+{
+    // Load a graphic into the texture    
+    textureBackground.loadFromFile(filePathToBackground);      
+    // Attach the texture to the sprite
+    spriteBackground.setTexture(textureBackground);
+    // Set the spriteBackground to cover the screen
+    spriteBackground.setPosition(x, y);    
+}
