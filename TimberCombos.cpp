@@ -144,24 +144,58 @@ int main()
         branches[i].setOrigin(220, 20); // The picture is 440 x 80 in dimensions ? Shoud this be 220, 40 enstead ?
     }
     
-    // Initialize branch positions for branches 0 to 5
-    //for (int i = 0; i < NUM_BRANCHES; i++)
-    //{
-    //    srand((int)time(0) + i);
-    //    int r = rand() % 5;
-    //    switch (r)
-    //    {
-    //    case 0:
-    //        branchPositions[i] = side::LEFT;
-    //        break;
-    //    case 1:
-    //        branchPositions[i] = side::RIGHT;
-    //        break;
-    //    default:
-    //        branchPositions[i] = side::NONE;
-    //        break;
-    //    }
-    //}    
+    // Prepare the player
+    Texture texturePlayer;
+    texturePlayer.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/player.png");
+    Sprite spritePlayer;
+    spritePlayer.setTexture(texturePlayer);
+    spritePlayer.setPosition(580, 720);
+    // Player starts on the left
+    side playerSide = side::LEFT;
+    // Prepare the grave stone
+    Texture textureRip;
+    textureRip.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/rip.png");
+    Sprite spriteRip;
+    spriteRip.setTexture(textureRip);
+    spriteRip.setPosition(600, 860);
+    // Prepare axe
+    Texture textureAxe;
+    textureAxe.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/axe.png");
+    Sprite spriteAxe;
+    spriteAxe.setTexture(textureAxe);
+    // Line the axe up with the tree
+    // determine the horizontal position the axe will be drawn at, depends on player side
+    const float AXE_POSITION_LEFT = 700;// 800-76 = 724 My calculation
+    const float AXE_POSITION_RIGHT = 1075;// 800 + 300 - 76 = 1024
+    spriteAxe.setPosition(700, 830);
+    // Prepare the flying log    
+    Texture textureLog;
+    textureLog.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/log.png");
+    Sprite spriteLog;
+    spriteLog.setTexture(textureLog);
+    spriteLog.setPosition(810, 720); // yLog = 720(playerY) + 120(logHeight); yLog = 840
+    bool logActive = false;
+    float logSpeedX = 1000.0f;
+    float logSpeedY = -1500.0f;
+
+ /*    Initialize branch positions for branches 0 to 5*/
+    for (int i = 0; i < NUM_BRANCHES; i++)
+    {
+        srand((int)time(0) + i);
+        int r = rand() % 5;
+        switch (r)
+        {
+        case 0:
+            branchPositions[i] = side::LEFT;
+            break;
+        case 1:
+            branchPositions[i] = side::RIGHT;
+            break;
+        default:
+            branchPositions[i] = side::NONE;
+            break;
+        }
+    }    
     /*updateBranches(1);*/
     /*updateBranches(2);
     updateBranches(3);
@@ -357,7 +391,7 @@ int main()
                 timeLowerBranch = 2.0f;
             }       
 
-            // Position all the branches...
+            // Position all the branches
             for (int i = NUM_BRANCHES - 1; i >= 0; i--)
             {
                 if (branchPositions[i] == side::LEFT)
@@ -403,6 +437,14 @@ int main()
         }
         // Draw the tree
         window.draw(spriteTree);
+        // Draw the player
+        window.draw(spritePlayer);
+        // Draw the axe
+        window.draw(spriteAxe);
+        // Draw the log
+        window.draw(spriteLog);
+        // Draw the rip
+        window.draw(spriteRip);
         // Draw the insect
         window.draw(spriteBee);
         // Draw the score
@@ -512,7 +554,7 @@ void updateBranches(int seed)
 
 side randomizePosition(int seed)
 {
-    // Generate new branch position for 0 element
+    // Generate new branch position
     srand((int)time(0) * seed);
     int remainder = rand() % 3;
     switch (remainder)
