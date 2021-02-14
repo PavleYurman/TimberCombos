@@ -10,22 +10,24 @@
 // Make code easier to type with “using namespace”
 using namespace sf;
 
-// Function declaration
-void positionBranches();
-void updateBranches(int seed);
-int const NUM_BRANCHES = 6;
-Sprite branches[NUM_BRANCHES];
-// Where is the player / branch?
-// Left or right
 enum class side
 {
     LEFT,
     RIGHT,
     NONE
 };
+// Function declaration
+void positionBranches();
+side randomizePosition(int seed);
+void updateBranches(int seed);
+int const NUM_BRANCHES = 6;
+Sprite branches[NUM_BRANCHES];
+// Where is the player / branch?
+// Left or right
+
 side branchPositions[NUM_BRANCHES];
 bool buttonIsPressed = false;
-float branchHight = 0;
+float branchHight[NUM_BRANCHES]{ 0.0f, 150.0f, 300.0f, 450.0f, 600.0f, 750.0f};
 
 // This is where our game starts from
 int main()
@@ -180,8 +182,7 @@ int main()
             paused = false;
             // Reset the time and the score
             timeRemaining = 50.0f;
-            timeLowerBranch = 0.7f;
-            branchHight = 0;
+            timeLowerBranch = 0.7f;            
             score = 0;               
         }
         
@@ -344,16 +345,40 @@ int main()
             timeLowerBranch -= dt.asSeconds();
             if (timeLowerBranch <= 0.0f)
             {
-                branchHight += 150.0f;
+                for (int i = NUM_BRANCHES - 1; i >= 0; i--)
+                {
+                    branchHight[i] += 150.0f;
+                    if (branchHight[i] >= 900)
+                    {
+                        branchHight[i] = 0.0f;
+                        branchPositions[i] = randomizePosition(12);
+                    }
+                }                
                 timeLowerBranch = 2.0f;
-            }
-            if (branchHight >= 900)
+            }       
+
+            // Position all the branches...
+            for (int i = NUM_BRANCHES - 1; i >= 0; i--)
             {
-                branchHight = 0.0f;
-            }
-            branches[0].setPosition(610.0f, branchHight);
-            // Flip the side other way
-            branches[0].setRotation(180);
+                if (branchPositions[i] == side::LEFT)
+                {
+                    // Move the sprite to the left side of the tree
+                    branches[i].setPosition(610.0f, branchHight[i]);
+                    // Flip the side other way
+                    branches[i].setRotation(180);
+                }
+                else if (branchPositions[i] == side::RIGHT)
+                {
+                    // Move the sprite to the right side
+                    branches[i].setPosition(1330.0f, branchHight[i]);
+                    // Set the sprite rotation to normal
+                    branches[i].setRotation(0);
+                }
+                else
+                {
+                    branches[i].setPosition(3000.0f, 3000.0f);
+                }
+            }            
 
         }// End if(!paused)
 
@@ -372,10 +397,10 @@ int main()
         window.draw(spriteCloud2);
         window.draw(spriteCloud3);
         // Draw branches
-        //for (int i = 0; i < NUM_BRANCHES; i++)
-        //{
-            window.draw(branches[0]);
-   /*     }*/
+        for (int i = 0; i < NUM_BRANCHES; i++)
+        {
+            window.draw(branches[i]);
+        }
         // Draw the tree
         window.draw(spriteTree);
         // Draw the insect
@@ -485,6 +510,21 @@ void updateBranches(int seed)
     //}
 }
 
+side randomizePosition(int seed)
+{
+    // Generate new branch position for 0 element
+    srand((int)time(0) * seed);
+    int remainder = rand() % 3;
+    switch (remainder)
+    {
+    case 0:
+        return side::LEFT;
+    case 1:
+        return side::RIGHT;
+    default:
+        return side::NONE;        
+    }
+}
 
 
 
