@@ -219,7 +219,15 @@ int main()
             timeLowerBranch = 0.7f;            
             score = 0;               
         }
-        
+        // Move player
+        if (Keyboard::isKeyPressed(Keyboard::Key::Left) && (playerSide == side::RIGHT))
+        {
+            playerSide = side::LEFT;
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Key::Right) && (playerSide == side::LEFT))
+        {
+            playerSide = side::RIGHT;
+        }
        
         /* ****************************************
         Update the scene
@@ -413,6 +421,15 @@ int main()
                     branches[i].setPosition(3000.0f, 3000.0f);
                 }
             }            
+            // Update player movement
+            if (playerSide == side::LEFT)
+            {
+                spritePlayer.setPosition(580.0f, 720.0f);
+            }
+            else
+            {
+                spritePlayer.setPosition(1200.0f, 720.0f);
+            }
 
         }// End if(!paused)
 
