@@ -167,7 +167,7 @@ int main()
     // determine the horizontal position the axe will be drawn at, depends on player side
     const float AXE_POSITION_LEFT = 700;// 800-76 = 724 My calculation
     const float AXE_POSITION_RIGHT = 1075;// 800 + 300 - 76 = 1024
-    spriteAxe.setPosition(700, 830);
+    spriteAxe.setPosition(2000, 830);
     // Prepare the flying log    
     Texture textureLog;
     textureLog.loadFromFile("D:/GameProgramming/VS Projects/Timber/graphics/log.png");
@@ -177,35 +177,29 @@ int main()
     bool logActive = false;
     float logSpeedX = 1000.0f;
     float logSpeedY = -1500.0f;
+    bool acceptInput = false;
 
  /*    Initialize branch positions for branches 0 to 5*/
     for (int i = 0; i < NUM_BRANCHES; i++)
-    {
-        srand((int)time(0) + i);
-        int r = rand() % 5;
-        switch (r)
-        {
-        case 0:
-            branchPositions[i] = side::LEFT;
-            break;
-        case 1:
-            branchPositions[i] = side::RIGHT;
-            break;
-        default:
-            branchPositions[i] = side::NONE;
-            break;
-        }
+    {       
+       branchPositions[i] = side::NONE;      
     }    
-    /*updateBranches(1);*/
-    /*updateBranches(2);
-    updateBranches(3);
-    updateBranches(4);
-    updateBranches(5);*/
+    Event event;
+
     while (window.isOpen()) {
 
         /* ****************************************
         Handle the players input
         **************************************** */
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::KeyReleased && !paused)
+            {
+                acceptInput = true;
+                spriteAxe.setPosition(2000.0f, spriteAxe.getPosition().y);
+            }
+        }
+
         if (Keyboard::isKeyPressed(Keyboard::Key::Escape))
         {
             window.close();
@@ -219,16 +213,35 @@ int main()
             timeLowerBranch = 0.7f;            
             score = 0;               
         }
-        // Move player
-        if (Keyboard::isKeyPressed(Keyboard::Key::Left) && (playerSide == side::RIGHT))
+        if (acceptInput)
         {
-            playerSide = side::LEFT;
+            // Activate chopping of the log only when player is already positioned
+            if (Keyboard::isKeyPressed(Keyboard::Key::Right))
+            {
+                logActive = true;
+                logSpeedX = -5000;
+                playerSide == side::RIGHT;
+                spritePlayer.setPosition(1200.0f, spritePlayer.getPosition().y);
+                spriteLog.setPosition(810, spriteLog.getPosition().y);
+                spriteAxe.setPosition(AXE_POSITION_RIGHT, spriteAxe.getPosition().y);
+                score++;                
+                updateBranches(score);
+                acceptInput = false;
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Key::Left))
+            {
+                logActive = true;
+                logSpeedX = 5000;
+                spriteLog.setPosition(810, 720);
+                spritePlayer.setPosition(580, spritePlayer.getPosition().y);
+                playerSide == side::LEFT;
+                spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);
+                score++;                
+                updateBranches(score);
+                acceptInput = false;
+            }            
         }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Right) && (playerSide == side::LEFT))
-        {
-            playerSide = side::RIGHT;
-        }
-       
+
         /* ****************************************
         Update the scene
         **************************************** */
@@ -420,16 +433,8 @@ int main()
                 {
                     branches[i].setPosition(3000.0f, 3000.0f);
                 }
-            }            
-            // Update player movement
-            if (playerSide == side::LEFT)
-            {
-                spritePlayer.setPosition(580.0f, 720.0f);
-            }
-            else
-            {
-                spritePlayer.setPosition(1200.0f, 720.0f);
-            }
+            }         
+            
 
         }// End if(!paused)
 
@@ -457,7 +462,7 @@ int main()
         // Draw the player
         window.draw(spritePlayer);
         // Draw the axe
-        window.draw(spriteAxe);
+        window.draw(spriteAxe);            
         // Draw the log
         window.draw(spriteLog);
         // Draw the rip
