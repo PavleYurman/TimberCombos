@@ -20,7 +20,7 @@ enum class side
 void positionBranches();
 side randomizePosition(int seed);
 void updateBranches(int seed);
-Text operationMessageText(std::string message);
+Text operationMessageText(std::string operatinMessage, Font f);
 Text operationMessage;
 int const NUM_BRANCHES = 6;
 Sprite branches[NUM_BRANCHES];
@@ -181,7 +181,9 @@ int main()
     float logSpeedY = -1500.0f;
     bool acceptInput = false;
 
-    operationMessage = operationMessageText("operation: ");
+    std::string ssOperationMessage = "operation:";
+    
+    // Idea to write operations in a game
     Event event;
 
     while (window.isOpen()) {
@@ -240,7 +242,7 @@ int main()
                 }
                 
                 spritePlayer.setPosition(1200.0f, spritePlayer.getPosition().y);
-                spriteLog.setPosition(810, spriteLog.getPosition().y);                           
+                spriteLog.setPosition(810, 720);                           
                 acceptInput = false;
             }
             if (Keyboard::isKeyPressed(Keyboard::Key::Left))
@@ -261,7 +263,7 @@ int main()
                     spriteAxe.setPosition(2000.0f, spriteAxe.getPosition().y);
                 }                
                 spritePlayer.setPosition(580, spritePlayer.getPosition().y);
-                spriteLog.setPosition(810, spriteLog.getPosition().y);                                  
+                spriteLog.setPosition(810, 720);                                  
                 acceptInput = false;
             }            
         }
@@ -458,7 +460,25 @@ int main()
                     branches[i].setPosition(3000.0f, 3000.0f);
                 }
             }         
-            
+            // Update the log
+            if (logActive)
+            {
+                if (AXE_POSITION_LEFT)
+                {
+                    spriteLog.setPosition(Vector2f(spriteLog.getPosition().x + (logSpeedX * dt.asSeconds()),
+                        spriteLog.getPosition().y + (logSpeedY * dt.asSeconds())));
+                }
+                else
+                {
+                    spriteLog.setPosition(Vector2f(spriteLog.getPosition().x - (logSpeedX * dt.asSeconds()),
+                        spriteLog.getPosition().y + (logSpeedY * dt.asSeconds())));
+                }
+            }
+            if (spriteLog.getPosition().y < 0.0f)
+            {
+                logActive = false;
+                spriteLog.setPosition(810, 720);
+            }
 
         }// End if(!paused)
 
@@ -504,8 +524,7 @@ int main()
             window.draw(messageText);
   
 
-        }
-        window.draw(operationMessage);
+        }        
         window.display();
 
     }
@@ -617,12 +636,14 @@ side randomizePosition(int seed)
     }
 }
 
-Text operationMessageText(std::string message)
+// Idea to write operations message - program execution
+Text operationMessageText(std::string operationMessage, Font f)
 {
     
     Text operationMessageText;
-    // Set the font to our message    
-    operationMessageText.setString(message);
+    // Set the font to our message  
+    operationMessageText.setFont(f);
+    operationMessageText.setString(operationMessage);
     operationMessageText.setCharacterSize(40);      
     operationMessageText.setFillColor(Color::Green);    
     // Position the text
