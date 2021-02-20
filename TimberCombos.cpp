@@ -20,6 +20,8 @@ enum class side
 void positionBranches();
 side randomizePosition(int seed);
 void updateBranches(int seed);
+Text operationMessageText(std::string message);
+Text operationMessage;
 int const NUM_BRANCHES = 6;
 Sprite branches[NUM_BRANCHES];
 // Where is the player / branch?
@@ -31,7 +33,7 @@ float branchHight[NUM_BRANCHES]{ 0.0f, 150.0f, 300.0f, 450.0f, 600.0f, 750.0f};
 
 // This is where our game starts from
 int main()
-{
+{    
     // Create a video mode object
     VideoMode vm(1920, 1080);
     // Create and open a window for the game
@@ -179,11 +181,7 @@ int main()
     float logSpeedY = -1500.0f;
     bool acceptInput = false;
 
- /*    Initialize branch positions for branches 0 to 5*/
-    for (int i = 0; i < NUM_BRANCHES; i++)
-    {       
-       branchPositions[i] = side::NONE;      
-    }    
+    operationMessage = operationMessageText("operation: ");
     Event event;
 
     while (window.isOpen()) {
@@ -211,33 +209,59 @@ int main()
             // Reset the time and the score
             timeRemaining = 50.0f;
             timeLowerBranch = 0.7f;            
-            score = 0;               
+            score = 0;    
+            /*    Initialize branch positions for branches 0 to 5*/
+            for (int i = 1; i < NUM_BRANCHES; i++)
+            {
+                branchPositions[i] = side::NONE;
+            }
         }
         if (acceptInput)
         {
             // Activate chopping of the log only when player is already positioned
             if (Keyboard::isKeyPressed(Keyboard::Key::Right))
             {
-                logActive = true;
-                logSpeedX = -5000;
-                playerSide == side::RIGHT;
+                // Idea: make player swing the axe once he has arived on the right side // same for left
+                // Change position / chopp
+                
+                if (playerSide == side::RIGHT)
+                {                    
+                    logActive = true;
+                    logSpeedX = -5000;
+                    updateBranches(score);
+                    spriteAxe.setPosition(AXE_POSITION_RIGHT, spriteAxe.getPosition().y);
+                    score++;                    
+                    // Add to the time
+                }
+                else
+                {
+                    playerSide = side::RIGHT;   
+                    spriteAxe.setPosition(2000.0f, spriteAxe.getPosition().y);
+                }
+                
                 spritePlayer.setPosition(1200.0f, spritePlayer.getPosition().y);
-                spriteLog.setPosition(810, spriteLog.getPosition().y);
-                spriteAxe.setPosition(AXE_POSITION_RIGHT, spriteAxe.getPosition().y);
-                score++;                
-                updateBranches(score);
+                spriteLog.setPosition(810, spriteLog.getPosition().y);                           
                 acceptInput = false;
             }
             if (Keyboard::isKeyPressed(Keyboard::Key::Left))
             {
-                logActive = true;
-                logSpeedX = 5000;
-                spriteLog.setPosition(810, 720);
+                if (playerSide == side::LEFT)
+                {
+                    
+                    logActive = true;
+                    logSpeedX = 5000;
+                    updateBranches(score);
+                    score++;
+                    spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);
+                }
+                // Swithching position from right to left
+                else
+                {
+                    playerSide = side::LEFT;              
+                    spriteAxe.setPosition(2000.0f, spriteAxe.getPosition().y);
+                }                
                 spritePlayer.setPosition(580, spritePlayer.getPosition().y);
-                playerSide == side::LEFT;
-                spriteAxe.setPosition(AXE_POSITION_LEFT, spriteAxe.getPosition().y);
-                score++;                
-                updateBranches(score);
+                spriteLog.setPosition(810, spriteLog.getPosition().y);                                  
                 acceptInput = false;
             }            
         }
@@ -478,7 +502,10 @@ int main()
         {
             // Draw our message
             window.draw(messageText);
+  
+
         }
+        window.draw(operationMessage);
         window.display();
 
     }
@@ -590,6 +617,20 @@ side randomizePosition(int seed)
     }
 }
 
+Text operationMessageText(std::string message)
+{
+    
+    Text operationMessageText;
+    // Set the font to our message    
+    operationMessageText.setString(message);
+    operationMessageText.setCharacterSize(40);      
+    operationMessageText.setFillColor(Color::Green);    
+    // Position the text
+    FloatRect textOpRect = operationMessageText.getLocalBounds();
+    operationMessageText.setOrigin(textOpRect.left + textOpRect.width / 2.0f, textOpRect.top + textOpRect.height / 2.0f);
+    operationMessageText.setPosition((192.0f / 2) , 980.0f);
 
+    return operationMessageText;
+}
 
 
