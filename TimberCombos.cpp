@@ -29,7 +29,7 @@ Sprite branches[NUM_BRANCHES];
 
 side branchPositions[NUM_BRANCHES];
 bool buttonIsPressed = false;
-float branchHight[NUM_BRANCHES]{ 0.0f, 150.0f, 300.0f, 450.0f, 600.0f, 750.0f};
+//float branchHight[NUM_BRANCHES]{ 0.0f, 150.0f, 300.0f, 450.0f, 600.0f, 750.0f};
 
 // This is where our game starts from
 int main()
@@ -180,6 +180,8 @@ int main()
     float logSpeedX = 1000.0f;
     float logSpeedY = -1500.0f;
     bool acceptInput = false;
+    // Introduce playerDies
+    bool playerDies = false;
 
     std::string ssOperationMessage = "operation:";
     
@@ -217,6 +219,7 @@ int main()
             {
                 branchPositions[i] = side::NONE;
             }
+            playerDies = false;
         }
         if (acceptInput)
         {
@@ -422,36 +425,37 @@ int main()
             //}
             // Position one branch            
             // Move the sprite to the left side of the tree
-            // Make timer to change the height
-            timeLowerBranch -= dt.asSeconds();
-            if (timeLowerBranch <= 0.0f)
-            {
-                for (int i = NUM_BRANCHES - 1; i >= 0; i--)
-                {
-                    branchHight[i] += 150.0f;
-                    if (branchHight[i] >= 900)
-                    {
-                        branchHight[i] = 0.0f;
-                        branchPositions[i] = randomizePosition(12);
-                    }
-                }                
-                timeLowerBranch = 2.0f;
-            }       
+            //// Make timer to change the height
+            //timeLowerBranch -= dt.asSeconds();
+            //if (timeLowerBranch <= 0.0f)
+            //{
+            //    for (int i = NUM_BRANCHES - 1; i >= 0; i--)
+            //    {
+            //        branchHight[i] += 150.0f;
+            //        if (branchHight[i] >= 900)
+            //        {
+            //            branchHight[i] = 0.0f;
+            //            branchPositions[i] = randomizePosition(12);
+            //        }
+            //    }                
+            //    timeLowerBranch = 2.0f;
+            //}       
 
             // Position all the branches
-            for (int i = NUM_BRANCHES - 1; i >= 0; i--)
+            for (int i = 0; i < NUM_BRANCHES; i++)
             {
+                float hight = i * 140;
                 if (branchPositions[i] == side::LEFT)
                 {
                     // Move the sprite to the left side of the tree
-                    branches[i].setPosition(610.0f, branchHight[i]);
+                    branches[i].setPosition(610.0f, hight);
                     // Flip the side other way
                     branches[i].setRotation(180);
                 }
                 else if (branchPositions[i] == side::RIGHT)
                 {
                     // Move the sprite to the right side
-                    branches[i].setPosition(1330.0f, branchHight[i]);
+                    branches[i].setPosition(1330.0f, hight);
                     // Set the sprite rotation to normal
                     branches[i].setRotation(0);
                 }
@@ -478,6 +482,14 @@ int main()
             {
                 logActive = false;
                 spriteLog.setPosition(810, 720);
+            }
+            // Handle players death
+            if (spritePlayer.getPosition().y <= branches[5].getPosition().y && playerSide == branchPositions[5])
+            {
+                playerDies = true;
+                spriteRip.setPosition(spritePlayer.getPosition().x, spritePlayer.getPosition().y);
+                spritePlayer.setPosition(2000.0f, spritePlayer.getPosition().y);
+                paused = true;
             }
 
         }// End if(!paused)
@@ -510,7 +522,10 @@ int main()
         // Draw the log
         window.draw(spriteLog);
         // Draw the rip
-        window.draw(spriteRip);
+        if (playerDies)
+        {
+            window.draw(spriteRip);
+        }
         // Draw the insect
         window.draw(spriteBee);
         // Draw the score
@@ -572,6 +587,8 @@ int main()
     {
         std::cout <<(int) branchPositions[i] << std::endl;
     }
+
+    std::cout << logSpeedX * timePerFrame.asSeconds(); // How many px per sec
 
     return 0;
 }
