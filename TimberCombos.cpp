@@ -242,6 +242,11 @@ int main()
                 {
                     playerSide = side::RIGHT;   
                     spriteAxe.setPosition(2000.0f, spriteAxe.getPosition().y);
+                    // Anulate last branch if it is in the way of the player
+                    if (branches[5].getPosition().y > spritePlayer.getPosition().y && playerSide == branchPositions[5])
+                    {
+                        branchPositions[5] = side::NONE;
+                    }
                 }
                 
                 spritePlayer.setPosition(1200.0f, spritePlayer.getPosition().y);
@@ -264,6 +269,12 @@ int main()
                 {
                     playerSide = side::LEFT;              
                     spriteAxe.setPosition(2000.0f, spriteAxe.getPosition().y);
+                    // Anulate last branch if it is in the way of the player
+                    if (branches[5].getPosition().y > spritePlayer.getPosition().y && playerSide == branchPositions[5])
+                    {
+                        branchPositions[5] = side::NONE;
+                    }
+                    
                 }                
                 spritePlayer.setPosition(580, spritePlayer.getPosition().y);
                 spriteLog.setPosition(810, 720);                                  
@@ -444,7 +455,7 @@ int main()
             // Position all the branches
             for (int i = 0; i < NUM_BRANCHES; i++)
             {
-                float hight = i * 140;
+                float hight = i * 150;
                 if (branchPositions[i] == side::LEFT)
                 {
                     // Move the sprite to the left side of the tree
@@ -484,11 +495,18 @@ int main()
                 spriteLog.setPosition(810, 720);
             }
             // Handle players death
-            if (spritePlayer.getPosition().y <= branches[5].getPosition().y && playerSide == branchPositions[5])
+            if ((spritePlayer.getPosition().y <= branches[5].getPosition().y) && (playerSide == branchPositions[5]))
             {
                 playerDies = true;
                 spriteRip.setPosition(spritePlayer.getPosition().x, spritePlayer.getPosition().y);
                 spritePlayer.setPosition(2000.0f, spritePlayer.getPosition().y);
+                messageText.setString("Squished!!");
+                // Reposition the text based on its new size
+                FloatRect rectText = messageText.getLocalBounds();
+                // Move origin of text to the center of the text
+                messageText.setOrigin(rectText.left + (rectText.width / 2.0f),
+                    (rectText.top + (rectText.height / 2.0f)));
+                messageText.setPosition(1920 / 2.0f, 1080 / 2.0f);
                 paused = true;
             }
 
@@ -589,6 +607,8 @@ int main()
     }
 
     std::cout << logSpeedX * timePerFrame.asSeconds(); // How many px per sec
+    // what is the last y position of player and last branch
+    std::cout << spritePlayer.getPosition().y << " : " << branches[5].getPosition().y << std::endl;
 
     return 0;
 }
